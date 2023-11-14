@@ -5,8 +5,9 @@ const BASE_URL = 'http://localhost:5000';
 
 export let options = {
     stages: [
-        { duration: '2m', target: 2000 },
-        { duration: '1m', target: 0 },
+        { duration: '5m', target: 400 },
+        { duration: '20m', target: 400 },
+        { duration: '2m', target: 0 },
     ],
 };
 
