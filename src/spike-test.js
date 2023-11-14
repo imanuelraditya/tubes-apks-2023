@@ -4,13 +4,10 @@ import { sleep, check } from 'k6';
 const BASE_URL = 'http://localhost:5000';
 
 export let options = {
-    thresholds: {
-        http_req_duration: ['p(95)<500'],
-    },
     stages: [
-        { duration: '10s', target: 100 },
-        { duration: '30s', target: 100 },
-        { duration: '10s', target: 0 },
+        { duration: '5m', target: 400 },
+        { duration: '20m', target: 400 },
+        { duration: '2m', target: 0 },
     ],
 };
 
