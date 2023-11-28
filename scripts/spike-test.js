@@ -31,7 +31,7 @@ export const Register = (uniqueName, uniqueUsername, uniqueEmail, uniquePassword
         'Registration successful': (resp) => resp.status === 201,
     });
 
-    sleep(2);    
+    sleep(2);
 };
 
 export const Login = (uniqueUsername, uniquePassword) => {
@@ -39,26 +39,26 @@ export const Login = (uniqueUsername, uniquePassword) => {
         username: uniqueUsername,
         password: uniquePassword,
     };
-    const loginHeaders = {'Content-Type': 'application/json'};
-  
+    const loginHeaders = { 'Content-Type': 'application/json' };
+
     const loginResponse = http.post(`${BASE_URL}/users/login`, JSON.stringify(loginPayload), {
-      headers: loginHeaders,
+        headers: loginHeaders,
     });
-  
+
     check(loginResponse, {
-      'Login successful': (resp) => resp.status === 200,
+        'Login successful': (resp) => resp.status === 200,
     });
-  
-      token = loginResponse.json('token');
-  
+
+    token = loginResponse.json('token');
+
     sleep(1);
-  }
-    
-  export const GetMovieById = () => {
-    const movieId = '654dd0e40e2883108a60b830';
+}
+
+export const GetMovieById = () => {
+    const movieId = '6565e33c7b0be5636a11bc4b';
 
     const movieResponse = http.get(`${BASE_URL}/movies/${movieId}`, {
-        headers: { Authorization: `Bearer ${token}` }, 
+        headers: { Authorization: `Bearer ${token}` },
     });
 
     check(movieResponse, {
@@ -69,49 +69,48 @@ export const Login = (uniqueUsername, uniquePassword) => {
 }
 
 export const MakeReservation = (uniquePhone) => {
-    const movieId = '654dd0e40e2883108a60b830';
-    const cinemaId = '654dd0570e2883c31060b82b';
+    const movieId = '6565e33c7b0be5636a11bc4b';
+    const cinemaId = '656606cc808057cccc745d75';
     const phoneNumber = uniquePhone;
     const date = '2023/09/24';
     const startAt = 'bandung';
     const seats = ['A'];
     const ticketPrice = 50000;
     const total = 1;
-  
-    const reservationPayload = {
-      date,
-      startAt,
-      seats,
-      ticketPrice,
-      total,
-      movieId,
-      cinemaId,
-      username: 'testuser2', 
-      phone: phoneNumber,
-      checkin: false,
-    };
-  
-    const reservationHeaders = {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    };
-  
-    const reservationResponse = http.post(
-      `${BASE_URL}/reservations`,
-      JSON.stringify(reservationPayload),
-      {
-        headers: reservationHeaders,
-      }
-    );
-  
-    check(reservationResponse, {
-      'Reservation successful': (resp) => resp.status === 201,
-    });
-  
-    sleep(1);
-  }
 
-export default function () {
+    const reservationPayload = {
+        date,
+        startAt,
+        seats,
+        ticketPrice,
+        total,
+        movieId,
+        cinemaId,
+        username: 'testuser2',
+        phone: phoneNumber,
+        checkin: false,
+    };
+
+    const reservationHeaders = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+    };
+
+    const reservationResponse = http.post(
+        `${BASE_URL}/reservations`,
+        JSON.stringify(reservationPayload), {
+            headers: reservationHeaders,
+        }
+    );
+
+    check(reservationResponse, {
+        'Reservation successful': (resp) => resp.status === 201,
+    });
+
+    sleep(1);
+}
+
+export default function() {
     const uniqeNumber = Math.floor(Math.random() * 100000);
 
     const uniqueName = `Test User ${uniqeNumber}`;
