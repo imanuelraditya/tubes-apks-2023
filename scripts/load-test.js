@@ -1,16 +1,16 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = 'http://app:5000';
 
 // Declare token at global
 let token;
 
 export const options = {
     stages: [
-        { duration: '2s', target: 20 },
-        { duration: '20s', target: 20 },
-        { duration: '2s', target: 0 },
+        { duration: '2m', target: 200 },
+        { duration: '20m', target: 200 },
+        { duration: '2m', target: 0 },
     ],
     thresholds: {
         http_req_duration: ['p(95)<500'],
