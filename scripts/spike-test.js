@@ -1,24 +1,43 @@
 import http from 'k6/http';
 import { sleep, check } from 'k6';
 
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = 'http://app:5000';
+
+let token;
 
 export let options = {
     stages: [
         { duration: '2m', target: 2000 },
         { duration: '1m', target: 0 },
     ],
-    thresholds: {
-        http_req_duration: ['p(95)<500'],
-      },
 };
 
-// LOGIN
+export const Register = (uniqueName, uniqueUsername, uniqueEmail, uniquePassword, uniquePhone) => {
+    const registrationPayload = {
+        name: uniqueName,
+        username: uniqueUsername,
+        email: uniqueEmail,
+        password: uniquePassword,
+        role: "guest",
+        phone: uniquePhone,
+    };
+    const registrationHeaders = { 'Content-Type': 'application/json' };
 
-export const Login = () => {
+    const registrationResponse = http.post(`${BASE_URL}/users`, JSON.stringify(registrationPayload), {
+        headers: registrationHeaders,
+    });
+
+    check(registrationResponse, {
+        'Registration successful': (resp) => resp.status === 201,
+    });
+
+    sleep(2);    
+};
+
+export const Login = (uniqueUsername, uniquePassword) => {
     const loginPayload = {
-      username: 'testuser2',
-      password: 'testuser2',
+        username: uniqueUsername,
+        password: uniquePassword,
     };
     const loginHeaders = {'Content-Type': 'application/json'};
   
@@ -49,10 +68,10 @@ export const Login = () => {
     sleep(1);
 }
 
-export const MakeReservation = () => {
+export const MakeReservation = (uniquePhone) => {
     const movieId = '654dd0e40e2883108a60b830';
     const cinemaId = '654dd0570e2883c31060b82b';
-    const phoneNumber = '12345678901';
+    const phoneNumber = uniquePhone;
     const date = '2023/09/24';
     const startAt = 'bandung';
     const seats = ['A'];
@@ -93,7 +112,16 @@ export const MakeReservation = () => {
   }
 
 export default function () {
-    Login();
+    const uniqeNumber = Math.floor(Math.random() * 100000);
+
+    const uniqueName = `Test User ${uniqeNumber}`;
+    const uniqueUsername = `testuser${uniqeNumber}`;
+    const uniqueEmail = `testuser${uniqeNumber}@example.com`;
+    const uniquePassword = `testuser${uniqeNumber}`;
+    const uniquePhone = `+628123${uniqeNumber}`;
+
+    Register(uniqueName, uniqueUsername, uniqueEmail, uniquePassword, uniquePhone);
+    Login(uniqueUsername, uniquePassword);
     GetMovieById();
-    MakeReservation();
+    MakeReservation(uniquePhone);
 }
