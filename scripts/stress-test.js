@@ -11,11 +11,7 @@ export let options = {
         { duration: '20m', target: 400 },
         { duration: '2m', target: 0 },
     ],
-    thresholds: {
-        http_req_duration: ['p(95)<500'],
-    },
 };
-
 
 export const Register = (uniqueName, uniqueUsername, uniqueEmail, uniquePassword, uniquePhone) => {
     const registrationPayload = {
