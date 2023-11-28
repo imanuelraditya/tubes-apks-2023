@@ -7,9 +7,9 @@ const BASE_URL = 'http://app:5000';
 
 export let options = {
     stages: [
+        { duration: '90s', target: 400 },
         { duration: '5m', target: 400 },
-        { duration: '20m', target: 400 },
-        { duration: '2m', target: 0 },
+        { duration: '30s', target: 0 },
     ],
 };
 
@@ -56,7 +56,7 @@ export const Login = (uniqueUsername, uniquePassword) => {
 }
 
 export const GetMovieById = () => {
-    const movieId = '654dd0e40e2883108a60b830';
+    const movieId = '6565e33c7b0be5636a11bc4b';
 
     const movieResponse = http.get(`${BASE_URL}/movies/${movieId}`, {
         headers: { Authorization: `Bearer ${token}` },

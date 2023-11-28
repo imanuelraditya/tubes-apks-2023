@@ -7,9 +7,9 @@ let token;
 
 export const options = {
     stages: [
-        { duration: '1m', target: 200 },
-        { duration: '10m', target: 200 },
-        { duration: '1m', target: 0 },
+        { duration: '30s', target: 200 },
+        { duration: '5m', target: 200 },
+        { duration: '30s', target: 0 },
     ],
 };
 
@@ -25,39 +25,39 @@ export const Register = (uniqueName, uniqueUsername, uniqueEmail, uniquePassword
         phone: uniquePhone,
     };
     const registrationHeaders = { 'Content-Type': 'application/json' };
-  
+
     const registrationResponse = http.post(`${BASE_URL}/users`, JSON.stringify(registrationPayload), {
         headers: registrationHeaders,
     });
-  
+
     check(registrationResponse, {
         'Registration successful': (resp) => resp.status === 201,
     });
-  
-    sleep(2);    
-  };
+
+    sleep(2);
+};
 
 // LOGIN
-  
+
 export const Login = (uniqueUsername, uniquePassword) => {
     const loginPayload = {
         username: uniqueUsername,
         password: uniquePassword,
     };
-    const loginHeaders = {'Content-Type': 'application/json'};
-  
+    const loginHeaders = { 'Content-Type': 'application/json' };
+
     const loginResponse = http.post(`${BASE_URL}/users/login`, JSON.stringify(loginPayload), {
-      headers: loginHeaders,
+        headers: loginHeaders,
     });
-  
+
     check(loginResponse, {
-      'Login successful': (resp) => resp.status === 200,
+        'Login successful': (resp) => resp.status === 200,
     });
-  
-      token = loginResponse.json('token');
-  
+
+    token = loginResponse.json('token');
+
     sleep(1);
-  }
+}
 
 // MOVIES
 
@@ -96,25 +96,6 @@ export const GetMovieRecommendation = (uniqueUsername) => {
 
     check(movieResponse, {
         'Get movie recommendation successful': (resp) => resp.status === 200,
-    });
-
-    sleep(1);
-}
-
-export const DeleteMovie = () => {
-    const movieId = '6565cee3627e4ed107425e16';
-
-    const movieHeaders = {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-    };
-
-    const movieResponse = http.del(`${BASE_URL}/movies/${movieId}`, null, {
-        headers: movieHeaders,
-    });
-
-    check(movieResponse, {
-        'Delete movie successful': (resp) => resp.status === 200,
     });
 
     sleep(1);
@@ -176,7 +157,7 @@ export const GetCinemas = () => {
 }
 
 export const GetCinemaById = () => {
-    const cinemaId = '654dd0570e2883c31060b82b';
+    const cinemaId = '656606cc808057cccc745d75';
 
     const cinemaResponse = http.get(`${BASE_URL}/cinemas/${cinemaId}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -221,7 +202,7 @@ export const CreateCinema = () => {
 }
 
 export const UpdateCinema = () => {
-    const cinemaId = '654dd7140e2883116560b84f';
+    const cinemaId = '656606cc808057cccc745d75';
     const name = 'Test Cinema Updated';
     const ticketPrice = 70000;
     const city = 'Bandung';
@@ -252,25 +233,6 @@ export const UpdateCinema = () => {
     sleep(1);
 }
 
-export const DeleteCinema = () => {
-    const cinemaId = '654dd7140e2883116560b84f';
-
-    const cinemaHeaders = {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-    };
-
-    const cinemaResponse = http.del(`${BASE_URL}/cinemas/${cinemaId}`, null, {
-        headers: cinemaHeaders,
-    });
-
-    check(cinemaResponse, {
-        'Delete cinema successful': (resp) => resp.status === 200,
-    });
-
-    sleep(1);
-}
-
 // RESERVATIONS
 export const GetReservations = () => {
     const reservationResponse = http.get(`${BASE_URL}/reservations`, {
@@ -285,8 +247,8 @@ export const GetReservations = () => {
 }
 
 export const MakeReservation = (uniquePhone) => {
-    const movieId = '654dd0e40e2883108a60b830';
-    const cinemaId = '654dd0570e2883c31060b82b';
+    const movieId = '6565e33c7b0be5636a11bc4b';
+    const cinemaId = '656606cc808057cccc745d75';
     const phoneNumber = uniquePhone;
     const date = '2023/09/24';
     const startAt = 'bandung';
@@ -356,8 +318,8 @@ export const CreateShowtime = () => {
     const startAt = 'bandung';
     const startDate = '2023/11/28';
     const endDate = '2023/12/28';
-    const movieId = '654dd0e40e2883108a60b830';
-    const cinemaId = '654dd0570e2883c31060b82b';
+    const movieId = '6565e33c7b0be5636a11bc4b';
+    const cinemaId = '656606cc808057cccc745d75';
 
     const showtimePayload = {
         startAt,
@@ -397,13 +359,11 @@ export default function() {
     GetMovies();
     GetMovieById();
     GetMovieRecommendation(uniqueUsername);
-    DeleteMovie();
     CreateMovie();
     GetCinemas();
     GetCinemaById();
     CreateCinema();
     UpdateCinema();
-    DeleteCinema();
     GetReservations();
     MakeReservation(uniquePhone);
     GetShowtimes();
