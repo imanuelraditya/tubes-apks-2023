@@ -8,66 +8,92 @@ export let options = {
         { duration: '2m', target: 2000 },
         { duration: '1m', target: 0 },
     ],
+    thresholds: {
+        http_req_duration: ['p(95)<500'],
+      },
 };
 
-export const TicketReservation = () => {
-    const url = `${BASE_URL}/reservations`;
-    const payload = JSON.stringify({
-        date: "2023/09/24",
-        startAt: "bandung",
-        seats: ["B"],
-        ticketPrice: 50000,
-        total: 1,
-        movieId: "650d3fa4dd4dc724ef947f6c",
-        cinemaId: "650c5c2ee1101d1be65d8a48",
-        username: "wisnuas",
-        phone: "08123456789",
-        checkin: false
-    });
-    const params = {
-        headers: {
-        'Content-Type': 'application/json',
-        },
-    };
-    const res = http.post(url, payload, params);
-    check(res, {
-        'is status 201': (r) => r.status === 201,
-        'transaction time OK': (r) => r.timings.duration < 200,
-    });
-    sleep(1);
-    }
-    
-export const MovieSearch = () => {
-    const url = `${BASE_URL}/movies/654dd0e40e2883108a60b830`;
-    const res = http.get(url);
-    check(res, {
-        'is status 200': (r) => r.status === 200,
-        'transaction time OK': (r) => r.timings.duration < 200,
-    });
-    sleep(1);
-    }
+// LOGIN
 
-export const UserAuthentication = () => {
-    const url = `${BASE_URL}/users/login`;
-    const payload = JSON.stringify({
-        username: "pege",
-        password: "pw123456"
-    });
-    const params = {
-        headers: {
-        'Content-Type': 'application/json',
-        },
+export const Login = () => {
+    const loginPayload = {
+      username: 'testuser2',
+      password: 'testuser2',
     };
-    const res = http.post(url, payload, params);
-    check(res, {
-        'is status 200': (r) => r.status === 200,
-        'transaction time OK': (r) => r.timings.duration < 200,
+    const loginHeaders = {'Content-Type': 'application/json'};
+  
+    const loginResponse = http.post(`${BASE_URL}/users/login`, JSON.stringify(loginPayload), {
+      headers: loginHeaders,
     });
+  
+    check(loginResponse, {
+      'Login successful': (resp) => resp.status === 200,
+    });
+  
+      token = loginResponse.json('token');
+  
     sleep(1);
-    }
+  }
+    
+  export const GetMovieById = () => {
+    const movieId = '654dd0e40e2883108a60b830';
+
+    const movieResponse = http.get(`${BASE_URL}/movies/${movieId}`, {
+        headers: { Authorization: `Bearer ${token}` }, 
+    });
+
+    check(movieResponse, {
+        'Get movie by ID successful': (resp) => resp.status === 200,
+    });
+
+    sleep(1);
+}
+
+export const MakeReservation = () => {
+    const movieId = '654dd0e40e2883108a60b830';
+    const cinemaId = '654dd0570e2883c31060b82b';
+    const phoneNumber = '12345678901';
+    const date = '2023/09/24';
+    const startAt = 'bandung';
+    const seats = ['A'];
+    const ticketPrice = 50000;
+    const total = 1;
+  
+    const reservationPayload = {
+      date,
+      startAt,
+      seats,
+      ticketPrice,
+      total,
+      movieId,
+      cinemaId,
+      username: 'testuser2', 
+      phone: phoneNumber,
+      checkin: false,
+    };
+  
+    const reservationHeaders = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    };
+  
+    const reservationResponse = http.post(
+      `${BASE_URL}/reservations`,
+      JSON.stringify(reservationPayload),
+      {
+        headers: reservationHeaders,
+      }
+    );
+  
+    check(reservationResponse, {
+      'Reservation successful': (resp) => resp.status === 201,
+    });
+  
+    sleep(1);
+  }
 
 export default function () {
-    TicketReservation();
-    MovieSearch();
-    UserAuthentication();
+    Login();
+    GetMovieById();
+    MakeReservation();
 }
