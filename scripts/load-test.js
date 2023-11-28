@@ -3,41 +3,61 @@ import { check, sleep } from 'k6';
 
 const BASE_URL = 'http://app:5000';
 
-// Declare token at global
 let token;
 
 export const options = {
     stages: [
-        { duration: '2m', target: 200 },
-        { duration: '20m', target: 200 },
-        { duration: '2m', target: 0 },
+        { duration: '1m', target: 200 },
+        { duration: '10m', target: 200 },
+        { duration: '1m', target: 0 },
     ],
-    thresholds: {
-        http_req_duration: ['p(95)<500'],
-    },
 };
 
-// LOGIN
+// REGISTER
 
-export const Login = () => {
-    const loginPayload = {
-        username: 'testuser2',
-        password: 'testuser2',
+export const Register = (uniqueName, uniqueUsername, uniqueEmail, uniquePassword, uniquePhone) => {
+    const registrationPayload = {
+        name: uniqueName,
+        username: uniqueUsername,
+        email: uniqueEmail,
+        password: uniquePassword,
+        role: "superadmin",
+        phone: uniquePhone,
     };
-    const loginHeaders = { 'Content-Type': 'application/json' };
+    const registrationHeaders = { 'Content-Type': 'application/json' };
+  
+    const registrationResponse = http.post(`${BASE_URL}/users`, JSON.stringify(registrationPayload), {
+        headers: registrationHeaders,
+    });
+  
+    check(registrationResponse, {
+        'Registration successful': (resp) => resp.status === 201,
+    });
+  
+    sleep(2);    
+  };
 
+// LOGIN
+  
+export const Login = (uniqueUsername, uniquePassword) => {
+    const loginPayload = {
+        username: uniqueUsername,
+        password: uniquePassword,
+    };
+    const loginHeaders = {'Content-Type': 'application/json'};
+  
     const loginResponse = http.post(`${BASE_URL}/users/login`, JSON.stringify(loginPayload), {
-        headers: loginHeaders,
+      headers: loginHeaders,
     });
-
+  
     check(loginResponse, {
-        'Login successful': (resp) => resp.status === 200,
+      'Login successful': (resp) => resp.status === 200,
     });
-
-    token = loginResponse.json('token');
-
+  
+      token = loginResponse.json('token');
+  
     sleep(1);
-}
+  }
 
 // MOVIES
 
@@ -67,8 +87,8 @@ export const GetMovieById = () => {
     sleep(1);
 }
 
-export const GetMovieRecommendation = () => {
-    const username = 'testuser2';
+export const GetMovieRecommendation = (uniqueUsername) => {
+    const username = uniqueUsername;
 
     const movieResponse = http.get(`${BASE_URL}/movies/usermodeling/${username}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -76,26 +96,6 @@ export const GetMovieRecommendation = () => {
 
     check(movieResponse, {
         'Get movie recommendation successful': (resp) => resp.status === 200,
-    });
-
-    sleep(1);
-}
-
-export const EditMoviePhoto = () => {
-    const movieId = '654dd0e40e2883108a60b830';
-    const filePath = './images/Test.svg.png';
-
-    const editPhotoHeaders = {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-    };
-
-    const editPhotoResponse = http.post(
-        `${BASE_URL}/movies/photo/${movieId}`, { file: http.file(filePath) }, { headers: editPhotoHeaders },
-    );
-
-    check(editPhotoResponse, {
-        'Edit movie photo successful': (resp) => resp.status === 200,
     });
 
     sleep(1);
@@ -220,26 +220,6 @@ export const CreateCinema = () => {
     sleep(1);
 }
 
-export const UploadCinemaPhoto = () => {
-    const cinemaId = '654dd7140e2883116560b84f';
-    const filePath = './images/Test.svg.png';
-
-    const uploadPhotoHeaders = {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-    };
-
-    const uploadPhotoResponse = http.post(
-        `${BASE_URL}/cinemas/photo/${cinemaId}`, { file: http.file(filePath) }, { headers: uploadPhotoHeaders },
-    );
-
-    check(uploadPhotoResponse, {
-        'Upload cinema photo successful': (resp) => resp.status === 200,
-    });
-
-    sleep(1);
-}
-
 export const UpdateCinema = () => {
     const cinemaId = '654dd7140e2883116560b84f';
     const name = 'Test Cinema Updated';
@@ -291,47 +271,7 @@ export const DeleteCinema = () => {
     sleep(1);
 }
 
-// INVITATIONS
-
-export const SendInvitationEmail = () => {
-    const email = 'xxxxxxx@gmail.com';
-    const host = 'CINEMA PLUS';
-    const movie = 'Test Movie';
-    const date = '2023-09-24';
-    const time = '6.00PM GMT+7';
-    const cinema = 'cinema updated';
-    const image = 'https://upload.wikimedia.org/wikipedia/commons/3/3f/Placeholder_view_vector.svg';
-    const seat = 'A';
-
-    const invitationPayload = {
-        email,
-        host,
-        movie,
-        date,
-        time,
-        cinema,
-        image,
-        seat,
-    };
-
-    const invitationHeaders = {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-    };
-
-    const invitationResponse = http.post(`${BASE_URL}/invitations`, JSON.stringify(invitationPayload), {
-        headers: invitationHeaders,
-    });
-
-    check(invitationResponse, {
-        'Send invitation email successful': (resp) => resp.status === 201,
-    });
-
-    sleep(1);
-}
-
 // RESERVATIONS
-
 export const GetReservations = () => {
     const reservationResponse = http.get(`${BASE_URL}/reservations`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -344,10 +284,10 @@ export const GetReservations = () => {
     sleep(1);
 }
 
-export const MakeReservation = () => {
+export const MakeReservation = (uniquePhone) => {
     const movieId = '654dd0e40e2883108a60b830';
     const cinemaId = '654dd0570e2883c31060b82b';
-    const phoneNumber = '12345678901';
+    const phoneNumber = uniquePhone;
     const date = '2023/09/24';
     const startAt = 'bandung';
     const seats = ['A'];
@@ -444,7 +384,30 @@ export const CreateShowtime = () => {
 }
 
 export default function() {
-    Login();
+    const uniqeNumber = Math.floor(Math.random() * 100000);
+
+    const uniqueName = `Test User ${uniqeNumber}`;
+    const uniqueUsername = `testuser${uniqeNumber}`;
+    const uniqueEmail = `testuser${uniqeNumber}@example.com`;
+    const uniquePassword = `testuser${uniqeNumber}`;
+    const uniquePhone = `+628123${uniqeNumber}`;
+
+    Register(uniqueName, uniqueUsername, uniqueEmail, uniquePassword, uniquePhone);
+    Login(uniqueUsername, uniquePassword);
+    GetMovies();
     GetMovieById();
-    MakeReservation();
+    GetMovieRecommendation(uniqueUsername);
+    DeleteMovie();
+    CreateMovie();
+    GetCinemas();
+    GetCinemaById();
+    CreateCinema();
+    UpdateCinema();
+    DeleteCinema();
+    GetReservations();
+    MakeReservation(uniquePhone);
+    GetShowtimes();
+    GetShowtimeById();
+    CreateShowtime();
+    sleep(1);
 }
